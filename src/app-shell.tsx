@@ -673,7 +673,7 @@ export function AppShell() {
               </article>
               <article className="card setting-block">
                 <h3>{"About this frame"}</h3>
-                <p>{"Skylit"}</p>
+                <p>{"Hardin Skylit"}</p>
                 <p className="subtle">
                   {"An offline dashboard with connected services."}
                 </p>
