@@ -24,3 +24,11 @@ class ReleaseMetadataTest(unittest.TestCase):
             apk.write_bytes(b'changed APK')
             with self.assertRaises(ValueError):
                 release.validate_metadata(data, apk)
+
+
+    def test_badging_accepts_legacy_and_current_aapt_minimum_sdk_labels(self):
+        package = "package: name='com.hardin.skylit' versionCode='40' versionName='2.17.3'\n"
+        expected = ('com.hardin.skylit', 40, '2.17.3', 23)
+        for label in ['sdkVersion', 'minSdkVersion']:
+            self.assertEqual(release.apk_identity(package + label + ":'23'\n"), expected)
+        self.assertIsNone(release.apk_identity(package + "targetSdkVersion:'32'\n"))

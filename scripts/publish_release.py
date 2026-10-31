@@ -33,6 +33,14 @@ def validate_metadata(data, apk):
     return version
 
 
+def apk_identity(badging):
+    package = re.search(r"package: name='([^']+)' versionCode='(\d+)' versionName='([^']+)'", badging)
+    sdk = re.search(r"(?:minSdkVersion|sdkVersion):'(\d+)'", badging)
+    if not package or not sdk:
+        return None
+    return package[1], int(package[2]), package[3], int(sdk[1])
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--publish', action='store_true',
@@ -59,10 +67,7 @@ def main():
     run(str(tools / 'apksigner'), 'verify', '--verbose', str(apk), env=environment)
     badging = run(str(tools / 'aapt2'), 'dump', 'badging', str(apk),
                   capture_output=True, text=True).stdout
-    package = re.search(r"package: name='([^']+)' versionCode='(\d+)' versionName='([^']+)'", badging)
-    sdk = re.search(r"sdkVersion:'(\d+)'", badging)
-    if not package or not sdk or (package[1], int(package[2]), package[3], int(sdk[1])) != (
-            data['package'], data['versionCode'], version, data['minSdk']):
+    if apk_identity(badging) != (data['package'], data['versionCode'], version, data['minSdk']):
         raise SystemExit('APK package/version differs from the release metadata.')
     run('python3', 'scripts/check_public.py', '--history', '--apk', str(apk))
     scanner = shutil.which('gitleaks') or str(ROOT / '.local/gitleaks/gitleaks')
