@@ -13,10 +13,10 @@ class ReleaseMetadataTest(unittest.TestCase):
         with tempfile.TemporaryDirectory() as directory:
             apk = Path(directory) / 'fixture.apk'
             apk.write_bytes(b'synthetic APK bytes')
-            data = dict(package='com.wesbos.homehq', versionName='2.16.0', versionCode=35,
+            data = dict(package='com.hardin.skylit', sourceBranch='hardin-main', versionName='2.16.0', versionCode=35,
                         minSdk=23, asset='skylit-2.16.0.apk', sha256=hashlib.sha256(apk.read_bytes()).hexdigest())
             self.assertEqual(release.validate_metadata(data, apk), '2.16.0')
-            for key, value in [('asset','../update.apk'), ('asset','skylit-2.17.0.apk'),
+            for key, value in [('sourceBranch','main'), ('asset','../update.apk'), ('asset','skylit-2.17.0.apk'),
                                ('versionName','../latest'), ('versionCode',True),
                                ('versionCode',0), ('package','another.app'), ('sha256','0'*64)]:
                 with self.subTest(key=key, value=value), self.assertRaises(ValueError):

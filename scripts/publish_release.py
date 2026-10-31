@@ -21,7 +21,8 @@ def validate_metadata(data, apk):
     version = data.get('versionName', '')
     if not isinstance(version, str) or not re.fullmatch(r'\d{1,4}\.\d{1,4}\.\d{1,4}', version):
         raise ValueError('Invalid release version.')
-    if (data.get('package') != 'com.wesbos.homehq'
+    if (data.get('sourceBranch') != 'hardin-main'
+            or data.get('package') != 'com.hardin.skylit'
             or data.get('asset') != f'skylit-{version}.apk'
             or type(data.get('versionCode')) is not int
             or not 0 < data['versionCode'] <= 2147483647
@@ -41,10 +42,10 @@ def main():
         raise SystemExit('Commit the intended source before preparing a release.')
     branch = run('git', 'branch', '--show-current', capture_output=True, text=True).stdout.strip()
     commit = run('git', 'rev-parse', 'HEAD', capture_output=True, text=True).stdout.strip()
-    run('git', 'fetch', 'origin', 'main')
-    remote = run('git', 'rev-parse', 'origin/main', capture_output=True, text=True).stdout.strip()
-    if branch != 'main' or commit != remote:
-        raise SystemExit('Prepare releases from the committed and pushed main branch.')
+    run('git', 'fetch', 'origin', 'hardin-main')
+    remote = run('git', 'rev-parse', 'origin/hardin-main', capture_output=True, text=True).stdout.strip()
+    if branch != 'hardin-main' or commit != remote:
+        raise SystemExit('Prepare releases from the committed and pushed hardin-main branch.')
     apk, metadata = ROOT / 'dist/skylit.apk', ROOT / 'dist/update.json'
     data = json.loads(metadata.read_text())
     version = validate_metadata(data, apk)
@@ -84,7 +85,7 @@ def main():
                          f'on the frame during upgrades.\n\nSHA-256: {data["sha256"]}\n\nSource: '
                          f'{commit}\n\nSee docs/verification.md for tested scope and device limitations.\n')
         command = ['gh', 'release', 'create', 'v' + version, str(asset), str(metadata),
-                   '--repo', 'sachasayan/skylit', '--target', commit,
+                   '--repo', 'williamrexhardin/skylit', '--target', commit,
                    '--title', 'Skylit ' + version, '--notes-file', str(notes)]
         if not args.publish:
             command.append('--draft')

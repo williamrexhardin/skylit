@@ -13,7 +13,8 @@ class UpdatePolicyTest(unittest.TestCase):
 public class UpdatePolicyTest {
  static void yes(boolean b){if(!b)throw new AssertionError();}
  public static void main(String[] args){
- String root="https://github.com/sachasayan/skylit/releases/download/v2.16.0/";
+ yes(UpdatePolicy.branch("hardin-main"));yes(!UpdatePolicy.branch("main"));yes(!UpdatePolicy.branch(null));
+ String root="https://github.com/williamrexhardin/skylit/releases/download/v2.16.0/";
  yes(UpdatePolicy.asset(root+"skylit-2.16.0.apk","2.16.0","skylit-2.16.0.apk"));
  yes(UpdatePolicy.asset(root+"update.json","2.16.0","update.json"));
  for(String bad:new String[]{root.replace("https:","http:"),root.replace("github.com","github.com.evil.test"),root.replace("github.com","github.com:444"),root.replace("github.com","evil.test@github.com"),root.replace("/skylit/","/other/"),root.replace("/v2.16.0/","/v2.16.0/../v2.16.0/"),root+"../"})yes(!UpdatePolicy.asset(bad+"update.json","2.16.0","update.json"));

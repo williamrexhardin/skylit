@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.wesbos.homehq">
+    package="com.hardin.skylit">
 
   <uses-permission android:name="android.permission.INTERNET" />
   <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
@@ -9,16 +9,16 @@
 
   <queries><intent><action android:name="android.intent.action.MAIN"/><category android:name="android.intent.category.LAUNCHER"/></intent></queries>
   <application
-      android:label="Skylit"
+      android:label="Hardin Skylit"
       android:allowBackup="false"
       android:icon="@drawable/ic_skylit"
       android:hardwareAccelerated="true"
       android:usesCleartextTraffic="false"
       android:theme="@android:style/Theme.NoTitleBar.Fullscreen">
-    <receiver android:name=".UpdateReceiver" android:exported="false" />
-    <service android:name=".UpdateJob" android:permission="android.permission.BIND_JOB_SERVICE" android:exported="true" />
+    <receiver android:name="com.wesbos.homehq.UpdateReceiver" android:exported="false" />
+    <service android:name="com.wesbos.homehq.UpdateJob" android:permission="android.permission.BIND_JOB_SERVICE" android:exported="true" />
     <activity
-        android:name=".MainActivity"
+        android:name="com.wesbos.homehq.MainActivity"
         android:exported="true"
         android:launchMode="singleTask"
         android:screenOrientation="sensorLandscape"

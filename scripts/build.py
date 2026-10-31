@@ -46,4 +46,4 @@ print('Built:',output/('skylit-personal.apk' if args.personal else 'skylit.apk')
 
 if not args.personal:
     apk=output/'skylit.apk'
-    (output/'update.json').write_text(json.dumps({'package':'com.wesbos.homehq','versionCode':version_code,'versionName':version_name,'minSdk':23,'asset':f'skylit-{version_name}.apk','sourceCommit':subprocess.check_output(['git','rev-parse','HEAD'],cwd=root,text=True).strip(),'sourceDirty':bool(subprocess.check_output(['git','status','--porcelain'],cwd=root,text=True).strip()),'sha256':hashlib.sha256(apk.read_bytes()).hexdigest()},indent=2)+'\n')
+    (output/'update.json').write_text(json.dumps({'package':'com.hardin.skylit','sourceBranch':subprocess.check_output(['git','branch','--show-current'],cwd=root,text=True).strip(),'versionCode':version_code,'versionName':version_name,'minSdk':23,'asset':f'skylit-{version_name}.apk','sourceCommit':subprocess.check_output(['git','rev-parse','HEAD'],cwd=root,text=True).strip(),'sourceDirty':bool(subprocess.check_output(['git','status','--porcelain'],cwd=root,text=True).strip()),'sha256':hashlib.sha256(apk.read_bytes()).hexdigest()},indent=2)+'\n')
