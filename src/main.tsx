@@ -40,11 +40,15 @@ import { Onboarding } from "./pages/onboarding";
 import onboardingModel from "../web/onboarding-model.js";
 import { render } from "./lib/mount";
 import { Weather, OverviewWeather, weatherStore } from "./pages/weather";
+import { FrameNavigation } from "./pages/frame-navigation";
 import { Spotify } from "./pages/spotify";
 import { Updates } from "./pages/updates";
 import { mountChoiceControl } from "./components/choice-control";
 // Entry points are called only after the local frame surface is ready.
 export const UI = {
+  mountNavigation(target: Element) {
+    render(target, <FrameNavigation />);
+  },
   mountSpotify(target: Element, setup = false) {
     render(target, <Spotify setup={setup} />);
   },

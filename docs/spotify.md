@@ -36,3 +36,22 @@ Developer checks: native session isolation/command tests, dashboard layout tests
 and `node scripts/check_spotify.cjs` against the synthetic preview. Synthetic
 checks do not establish successful Spotify sign-in, account entitlements, audible
 playback, hardware Home navigation or reboot behavior on a real frame.
+
+## Navigation on frames without system buttons
+
+Spotify now has its own main-navigation page, independent of Settings → Apps.
+**Add Spotify widget** opens the gallery with Spotify visible. The widget is optional;
+existing layouts are not rearranged or overwritten. A full grid needs free space
+before a widget can be added. Both the page and the widget control the same session.
+
+On Spotify's page, or Settings → Frame → Return from Android apps, enable the
+**return button**. Android asks for Display over other apps permission. A foreground
+service waits up to two minutes during initial approval; after approval a draggable
+**‹ Skylit** button appears over other apps. Tap it to return to Overview. It hides
+while Skylit is foreground, including the slideshow, and does not capture screen
+contents or use Accessibility. The service has a persistent Android notification.
+It is restored when Skylit next resumes (including normal HOME startup after boot),
+not guaranteed after a force-stop or if Android kills/restricts the service. Protected
+system screens may suppress overlays. Disable the feature in Skylit or revoke the
+Android overlay permission to remove it. No permission is granted automatically.
+Opening Spotify without a configured return button shows an explicit recovery warning.

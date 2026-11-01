@@ -115,9 +115,11 @@ public class MainActivity extends Activity {
   private boolean validYouTube(String url){try{Uri u=Uri.parse(url);return "https".equals(u.getScheme())&&("www.youtube.com".equals(u.getHost())||"m.youtube.com".equals(u.getHost())||"youtube.com".equals(u.getHost()));}catch(Exception e){return false;}}
 
   public class DashboardBridge {
+    @JavascriptInterface public String navigationStatus(){return FrameNavigation.status(MainActivity.this);}
+    @JavascriptInterface public void navigationConfigure(boolean enabled){runOnUiThread(()->FrameNavigation.configure(MainActivity.this,enabled));}
     @JavascriptInterface public String spotifyStatus(){return spotify.status();}
     @JavascriptInterface public boolean spotifyCommand(String action){return spotify.command(action);}
-    @JavascriptInterface public void spotifyOpen(){runOnUiThread(()->spotify.open(MainActivity.this));}
+    @JavascriptInterface public void spotifyOpen(){runOnUiThread(()->{if(FrameNavigation.ready(MainActivity.this))spotify.open(MainActivity.this);else new android.app.AlertDialog.Builder(MainActivity.this).setTitle("Return from Spotify").setMessage("This frame may have no Home button. Enable the floating Skylit return button before opening Spotify so you can get back without ADB.").setPositiveButton("Enable return button",(d,w)->FrameNavigation.configure(MainActivity.this,true)).setNeutralButton("Open without it",(d,w)->spotify.open(MainActivity.this)).setNegativeButton("Cancel",null).show();});}
     @JavascriptInterface public void spotifyPermission(){runOnUiThread(()->spotify.permission(MainActivity.this));}
     @JavascriptInterface public void preferencesExport(String raw){try{final String safe=DisplayTransfer.validate(raw);runOnUiThread(()->{pendingDisplayExport=safe;openDisplayPicker(true);});}catch(Exception ignored){displayTransferResult("Choose a valid display-preferences file.");}}
     @JavascriptInterface public void preferencesImport(){runOnUiThread(()->openDisplayPicker(false));}
@@ -288,9 +290,9 @@ public class MainActivity extends Activity {
     return super.dispatchTouchEvent(e);
   }
   private void pauseMomo(boolean paused){if(dashboard!=null)dashboard.evaluateJavascript("window.Momo&&window.Momo.setPaused("+paused+")",null);}
-  @Override protected void onResume(){super.onResume();foreground=true;if(updates!=null)updates.touched();pauseMomo(remote!=null||localPhotosOpen||quietOpen);if(photoMail!=null)photoMail.maybeSync();resetIdle();hideBars();}
-  @Override protected void onPause(){foreground=false;pauseMomo(true);handler.removeCallbacks(idleTask);handler.removeCallbacks(exitTask);if(updates!=null)updates.activity(false);super.onPause();}
-  @Override protected void onNewIntent(Intent intent){super.onNewIntent(intent);WebView.setWebContentsDebuggingEnabled(intent.getBooleanExtra("debug",false));if(remote!=null)closeRemote();if(localPhotosOpen&&dashboard!=null)dashboard.evaluateJavascript("window.SkylitPhotos&&window.SkylitPhotos.close()",null);}
+  @Override protected void onResume(){super.onResume();foreground=true;FrameNavigation.dashboardVisible=true;FrameNavigation.restore(this);if(updates!=null)updates.touched();pauseMomo(remote!=null||localPhotosOpen||quietOpen);if(photoMail!=null)photoMail.maybeSync();resetIdle();hideBars();}
+  @Override protected void onPause(){foreground=false;FrameNavigation.dashboardVisible=false;pauseMomo(true);handler.removeCallbacks(idleTask);handler.removeCallbacks(exitTask);if(updates!=null)updates.activity(false);super.onPause();}
+  @Override protected void onNewIntent(Intent intent){super.onNewIntent(intent);if(intent.getBooleanExtra("return_home",false)&&dashboard!=null)dashboard.evaluateJavascript("window.SkylitApp&&SkylitApp.go('overview')",null);WebView.setWebContentsDebuggingEnabled(intent.getBooleanExtra("debug",false));if(remote!=null)closeRemote();if(localPhotosOpen&&dashboard!=null)dashboard.evaluateJavascript("window.SkylitPhotos&&window.SkylitPhotos.close()",null);}
   @Override public void onBackPressed(){if(quietOpen&&dashboard!=null){dashboard.evaluateJavascript("window.SkylitWorkspace&&window.SkylitWorkspace.restore()",null);return;}if(remote!=null){if(fullScreen!=null){hideCustomView();if(remoteDocked&&returnButton!=null){root.removeView(returnButton);returnButton=null;}}else if(remote.canGoBack())remote.goBack();else{closeRemote();dashboard.evaluateJavascript("window.SkylitApp&&SkylitApp.go(\"overview\")",null);}}else if(localPhotosOpen&&dashboard!=null)dashboard.evaluateJavascript("window.SkylitPhotos&&window.SkylitPhotos.close()",null);else if(dashboard!=null)dashboard.evaluateJavascript("window.SkylitApp&&window.SkylitApp.back()",null);}
   @Override public void onWindowFocusChanged(boolean hasFocus){super.onWindowFocusChanged(hasFocus);if(hasFocus)hideBars();}
   private int dp(int value){return Math.round(value*getResources().getDisplayMetrics().density);}

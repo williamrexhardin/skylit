@@ -49,6 +49,10 @@ export function AppShell() {
               <span data-icon="tv"></span>
               {"YouTube"}
             </NativeButton>
+            <NativeButton data-tab="spotify" className="nav">
+              <span data-icon="play"></span>
+              {"Spotify"}
+            </NativeButton>
             <NativeButton data-tab="settings" className="nav">
               <span data-icon="settings"></span>
               {"Settings"}
@@ -73,6 +77,25 @@ export function AppShell() {
             className="page"
             aria-label="Set up Skylit"
           ></section>
+          <section id="spotify" className="page" aria-label="Spotify">
+            <h1>Spotify</h1>
+            <article
+              className="card setting-block"
+              id="spotify-page-player"
+            ></article>
+            <article className="card setting-block">
+              <h2>On your dashboard</h2>
+              <p>
+                Add Spotify from the widget gallery. If the grid is full, resize
+                or remove a widget first.
+              </p>
+              <Button id="spotify-add-widget">Add Spotify widget</Button>
+            </article>
+            <article className="card setting-block" id="frame-navigation">
+              <h2>Return from other apps</h2>
+              <div id="frame-navigation-controls"></div>
+            </article>
+          </section>
           <section id="overview" className="page" aria-label="Overview">
             <div className="overview-grid">
               <header className="card overview-heading">
