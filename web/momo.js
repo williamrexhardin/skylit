@@ -26,6 +26,7 @@
   let mode=period()==='night'?'sleepy':period()==='morning'?'yawn':'hello',started=performance.now(),until=started+3000,nextIdle=started+90000;
   let lastInput=started,lastGaze=0,lookX=0,lookY=0,gazeX=0,gazeY=0,scrollKick=0;
   let nextBlink=started+2400,blinkStart=-10000,hatIndex=1,nextHat=started+90000;
+  let externalPaused=false;
   let manualIndex=0,paused=false,raf=0,lastFrame=0,frames=0,pointerBounds=null;
   const clamp=(v,min,max)=>Math.max(min,Math.min(max,v));
   const quiet=()=>prefs.motion==='still'||reduced.matches;
@@ -148,7 +149,7 @@
     if(!quiet())wake();
   }
   function wake(){if(!raf&&!paused&&!document.hidden)raf=requestAnimationFrame(step);}
-  function suspend(value){paused=!!value;if(raf){cancelAnimationFrame(raf);raf=0;}lastFrame=0;if(!paused){refreshCalendar();lastInput=performance.now();nextIdle=lastInput+90000;behavior.reset(lastInput);wake();}}
+  function suspend(value){externalPaused=!!value;paused=externalPaused||document.documentElement.dataset.navCollapsed==='true';if(raf){cancelAnimationFrame(raf);raf=0;}lastFrame=0;if(!paused){refreshCalendar();lastInput=performance.now();nextIdle=lastInput+90000;behavior.reset(lastInput);wake();}}
   button.addEventListener('click',()=>react(moods[manualIndex++%moods.length],true));
   document.getElementById('momo-preview').addEventListener('click',()=>react(moods[manualIndex++%moods.length],true));
   document.getElementById('momo-shuffle').addEventListener('click',()=>{const index=hats.indexOf(chosenHat());selectHat(hats[(index+1)%hats.length]);});
@@ -162,6 +163,7 @@
   new MutationObserver(()=>{const dark=document.documentElement.dataset.mode==='dark'||document.documentElement.dataset.theme==='cocoa';palette.ink=dark?'#f2d6a4':'#493b33';renderGallery();lastFrame=0;wake();}).observe(document.documentElement,{attributes:true,attributeFilter:['data-theme','data-mode']});
   document.addEventListener('visibilitychange',()=>{if(document.hidden){behavior.reset(performance.now());if(raf)cancelAnimationFrame(raf);raf=0;}else{refreshCalendar();lastFrame=0;wake();}});
   reduced.addEventListener('change',()=>{lastFrame=0;wake();});window.addEventListener('resize',resize);
+  window.addEventListener('skylit-navigation',()=>suspend(externalPaused));
   window.Momo={setPaused:suspend,greet:()=>{refreshCalendar();react(period()==='night'?'sleepy':period()==='morning'?'yawn':'hello');},status:()=>({hat:chosenHat(),preference:prefs.hat,period:period(),date:calendar.date,timezone:calendar.timezone,motion:prefs.motion,reduced:reduced.matches,paused,frames,expression:canvas.dataset.expression,context:canvas.dataset.context})};
   const gallery=document.getElementById('momo-gallery'),cards=[];
   const hatLabels={none:'Just Momo',beret:'Terracotta beret',beanie:'Bobble beanie',bucket:'Garden bucket',cap:'Weekend cap',party:'Party hat',crown:'Little crown',flower:'Flower clip',headphones:'Headphones',bow:'Ribbon bow',nightcap:'Nightcap',wizard:'Wizard hat',leaf:'Autumn leaf',earmuffs:'Winter earmuffs'};

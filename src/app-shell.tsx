@@ -9,6 +9,16 @@ export function AppShell() {
     <>
       <div className="shell">
         <aside className="rail">
+          <NativeButton
+            id="nav-toggle"
+            className="nav rail-toggle"
+            aria-label="Collapse navigation"
+            aria-expanded="true"
+            aria-controls="main-nav"
+          >
+            <span data-icon="menu"></span>
+            <span className="nav-label">Navigation</span>
+          </NativeButton>
           <div className="momo-home">
             <NativeButton
               id="momo"
@@ -24,34 +34,54 @@ export function AppShell() {
               ></canvas>
             </NativeButton>
           </div>
-          <nav aria-label="Main navigation">
-            <NativeButton data-tab="overview" className="nav">
+          <nav id="main-nav" aria-label="Main navigation">
+            <NativeButton
+              data-tab="overview"
+              aria-label="Overview"
+              className="nav"
+            >
               <span data-icon="overview"></span>
-              {"Overview"}
+              <span className="nav-label">{"Overview"}</span>
             </NativeButton>
-            <NativeButton data-tab="weather" className="nav active">
+            <NativeButton
+              data-tab="weather"
+              aria-label="Weather"
+              className="nav active"
+            >
               <span data-icon="sun"></span>
-              {"Weather"}
+              <span className="nav-label">{"Weather"}</span>
             </NativeButton>
-            <NativeButton data-tab="photos" className="nav">
+            <NativeButton data-tab="photos" aria-label="Photos" className="nav">
               <span data-icon="photo"></span>
-              {"Photos"}
+              <span className="nav-label">{"Photos"}</span>
             </NativeButton>
-            <NativeButton data-tab="calendar" className="nav">
+            <NativeButton
+              data-tab="calendar"
+              aria-label="Calendar"
+              className="nav"
+            >
               <span data-icon="calendar"></span>
-              {"Calendar"}
+              <span className="nav-label">{"Calendar"}</span>
             </NativeButton>
-            <NativeButton data-tab="home" className="nav">
+            <NativeButton data-tab="home" aria-label="Home" className="nav">
               <span data-icon="home"></span>
-              {"Home"}
+              <span className="nav-label">{"Home"}</span>
             </NativeButton>
-            <NativeButton data-tab="youtube" className="nav">
+            <NativeButton
+              data-tab="youtube"
+              aria-label="YouTube"
+              className="nav"
+            >
               <span data-icon="tv"></span>
-              {"YouTube"}
+              <span className="nav-label">{"YouTube"}</span>
             </NativeButton>
-            <NativeButton data-tab="settings" className="nav">
+            <NativeButton
+              data-tab="settings"
+              aria-label="Settings"
+              className="nav"
+            >
               <span data-icon="settings"></span>
-              {"Settings"}
+              <span className="nav-label">{"Settings"}</span>
             </NativeButton>
           </nav>
           <div className="rail-bottom">
