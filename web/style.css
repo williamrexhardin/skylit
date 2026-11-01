@@ -226,3 +226,10 @@ main{margin:0 auto}
 @media(prefers-reduced-motion:reduce){#photo-player .photo-slide,#photo-player .photo-player-bar,.overview-photo-stack img,.photo-tile img{transition:none}.photo-collage.is-entering img,#photo-player.idle #photo-idle-hint{animation:none}}
 
 .android-controls{display:flex;flex-wrap:wrap;gap:8px}
+
+/* Compact navigation preserves labelled, generous touch targets. */
+.rail-toggle{flex-shrink:0;width:100%;margin-bottom:8px}
+:root[data-nav-collapsed=true] .rail{width:72px;min-width:72px;padding:12px 8px}
+:root[data-nav-collapsed=true] .rail .momo-home,:root[data-nav-collapsed=true] .rail .rail-bottom,:root[data-nav-collapsed=true] .rail .nav-label{display:none}
+:root[data-nav-collapsed=true] .rail .nav{width:56px;min-width:48px;min-height:48px;padding:12px;justify-content:center;gap:0;font-size:0}
+@media(max-width:799px){:root[data-nav-collapsed=true] .rail{width:100%;min-width:0;padding:8px;display:flex;align-items:flex-start;gap:4px}:root[data-nav-collapsed=true] .rail-toggle{width:48px;flex:0 0 48px;margin:0}:root[data-nav-collapsed=true] .rail nav{display:flex;flex:1;flex-wrap:wrap;gap:2px}:root[data-nav-collapsed=true] .rail .nav{width:48px;flex:0 0 48px}}
