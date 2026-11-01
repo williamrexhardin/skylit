@@ -1,2 +1,2 @@
 'use strict';
-window.SkylitVersion={code:44,name:'2.18.2'};
+window.SkylitVersion={code:45,name:'2.18.3'};
