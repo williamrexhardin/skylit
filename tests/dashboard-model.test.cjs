@@ -24,11 +24,11 @@ test('move and resize reject collisions, non-integers and offscreen geometry wit
   const next=model.change(layout,'clock',{w:3,h:3});sound(next);assert.equal(model.change(next,'clock',{x:3,y:1}).modules[0].x,3);
   assert.equal(JSON.stringify(layout),before);
 });
-test('adding to a full dashboard makes space, preserves every module and supports all nine kinds',()=>{
+test('adding to a full dashboard makes space, preserves every module and supports every catalog kind',()=>{
   let layout=model.preset();const result=model.add(layout,'note');assert.equal(result.rearranged,true);assert.equal(result.added,true);layout=result.layout;
   for(const item of model.catalog)layout=model.add(layout,item.type).layout;
-  sound(layout);assert.equal(layout.modules.length,9);assert.equal(model.add(layout,'note').added,false);
-  const removed=model.remove(layout,'weather');assert.equal(removed.modules.length,8);assert.equal(layout.modules.length,9);
+  sound(layout);assert.equal(layout.modules.length,model.catalog.length);assert.equal(model.add(layout,'note').added,false);
+  const removed=model.remove(layout,'weather');assert.equal(removed.modules.length,model.catalog.length-1);assert.equal(layout.modules.length,model.catalog.length);
 });
 test('gallery drop needs free space; explicit removal leaves an empty layout usable',()=>{
   const layout=model.preset();assert.equal(model.add(layout,'note',{x:0,y:0}).added,false);
@@ -41,7 +41,7 @@ test('bounded arbitrary edit sequences preserve valid, unique and non-overlappin
   let layout=model.preset();let seed=31;
   const random=max=>{seed=(seed*1664525+1013904223)>>>0;return seed%max;};
   for(let n=0;n<600;n++){
-    const type=model.catalog[random(9)].type;
+    const type=model.catalog[random(model.catalog.length)].type;
     if(n%5===0)layout=model.add(layout,type).layout;
     else if(n%7===0)layout=model.remove(layout,type);
     else layout=model.change(layout,type,{x:random(15)-1,y:random(15)-1,w:random(13),h:random(13)})||layout;

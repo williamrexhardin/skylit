@@ -206,6 +206,13 @@ function WidgetMiniature({
   temperature: string;
   pictures: string[];
 }) {
+  if (type === "spotify")
+    return (
+      <>
+        <strong>Spotify</strong>
+        <span>⏮　▶　⏭</span>
+      </>
+    );
   if (type === "photos")
     return (
       <>

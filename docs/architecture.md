@@ -395,3 +395,14 @@ until the gesture ends. This preserves decoded photos and avoids repeated layout
 work while crossing grid cells. Detailed layout and persistence still use the
 canonical release path. Settings control synchronization happens after the gesture,
 and hidden Dashboard settings no longer render on other-category navigation.
+
+## Native Spotify controls
+
+`SpotifySessions` uses the owner-enabled Android notification-listener component
+solely to authorize media-session access. `SpotifyListener` implements no notification
+callbacks. The local DashboardBridge exposes Spotify status, fixed transport commands,
+launch and permission-settings routes; remote WebViews receive none of these methods.
+Only the exact Spotify package is selected. There are no global media-key broadcasts,
+network calls, OAuth secrets or persisted media metadata. The optional React Spotify
+widget is added via the existing module gallery; setup is in Settings → Apps.
+See [Spotify setup and acceptance](spotify.md).

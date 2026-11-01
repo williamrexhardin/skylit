@@ -40,10 +40,14 @@ import { Onboarding } from "./pages/onboarding";
 import onboardingModel from "../web/onboarding-model.js";
 import { render } from "./lib/mount";
 import { Weather, OverviewWeather, weatherStore } from "./pages/weather";
+import { Spotify } from "./pages/spotify";
 import { Updates } from "./pages/updates";
 import { mountChoiceControl } from "./components/choice-control";
 // Entry points are called only after the local frame surface is ready.
 export const UI = {
+  mountSpotify(target: Element, setup = false) {
+    render(target, <Spotify setup={setup} />);
+  },
   mountOnboarding() {
     window.SkylitOnboardingModel = onboardingModel;
     render(document.getElementById("setup")!, <Onboarding />);

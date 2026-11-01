@@ -28,7 +28,8 @@ export type ModuleType =
   | "shopping"
   | "note"
   | "countdowns"
-  | "timers";
+  | "timers"
+  | "spotify";
 export type DashboardModule = {
   type: ModuleType;
   x: number;

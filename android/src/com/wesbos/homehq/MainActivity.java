@@ -40,6 +40,7 @@ public class MainActivity extends Activity {
   private AsyncExport exports;
   private PhoneManagement phone;
   private AppUpdates updates;
+  private SpotifySessions spotify;
   private final java.util.concurrent.ExecutorService imports=java.util.concurrent.Executors.newSingleThreadExecutor();
   private int pickerKind;
   private String pendingDisplayExport;
@@ -58,6 +59,7 @@ public class MainActivity extends Activity {
     super.onCreate(state);
     prefs=getSharedPreferences("skylit",MODE_PRIVATE);
     updates=AppUpdates.get(this);
+    spotify=new SpotifySessions(this);
     calendars=new CalendarStore(getSharedPreferences("skylit-calendars",MODE_PRIVATE));
     photos=new PhotoStore(this);photoMail=new PhotoMail(this,photos,this::notifyLibrary);
     media=new LocalMedia(this,photos);exports=new AsyncExport(new AsyncExport.Target(){public String begin(){return media.beginExport();}public boolean append(String id,String chunk){return media.appendExport(id,chunk);}public String finish(String id)throws Exception{return media.finishExport(id);}public void cancel(){media.cancelExport();}});phone=new PhoneManagement(this,photos,media,new PhoneManagement.Dashboard(){
@@ -113,6 +115,10 @@ public class MainActivity extends Activity {
   private boolean validYouTube(String url){try{Uri u=Uri.parse(url);return "https".equals(u.getScheme())&&("www.youtube.com".equals(u.getHost())||"m.youtube.com".equals(u.getHost())||"youtube.com".equals(u.getHost()));}catch(Exception e){return false;}}
 
   public class DashboardBridge {
+    @JavascriptInterface public String spotifyStatus(){return spotify.status();}
+    @JavascriptInterface public boolean spotifyCommand(String action){return spotify.command(action);}
+    @JavascriptInterface public void spotifyOpen(){runOnUiThread(()->spotify.open(MainActivity.this));}
+    @JavascriptInterface public void spotifyPermission(){runOnUiThread(()->spotify.permission(MainActivity.this));}
     @JavascriptInterface public void preferencesExport(String raw){try{final String safe=DisplayTransfer.validate(raw);runOnUiThread(()->{pendingDisplayExport=safe;openDisplayPicker(true);});}catch(Exception ignored){displayTransferResult("Choose a valid display-preferences file.");}}
     @JavascriptInterface public void preferencesImport(){runOnUiThread(()->openDisplayPicker(false));}
     @JavascriptInterface public String updateStatus(){return updates.status();}

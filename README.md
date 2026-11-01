@@ -63,6 +63,7 @@ not a household account. They demonstrate the interface, not a live service sign
 | Calendar | Read-only month and selected-date agenda, source visibility in Settings, editable labels/colours, loaded-date search, direct Google iCal feeds, offline cache and on-frame inviter review |
 | Home | Google Home’s website, using its supported controls and your own session |
 | YouTube | Direct mobile-site browsing beside the sidebar, with full-screen video support |
+| Spotify · optional | Native Spotify app playback with local dashboard media controls; explicit Android Notification access required. See [setup](docs/spotify.md). |
 | Momo | Procedural Canvas 2D character, coordinated page/weather reactions, accessory gallery, daily outfits and bedtime routine |
 | Settings | Lightbox over the current screen, left-side category navigation, six paired palettes, astronomical mode, larger text, draggable/resizable dashboard editor and module gallery, optional navigation, quiet hours/privacy pause, service recovery and non-secret display transfer |
 | Household · optional | Local pinned note, shopping checklist with undo, countdowns and visible timers; no phone sync or background-alert promise |
