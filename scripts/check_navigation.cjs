@@ -10,6 +10,7 @@ const origin=process.env.SKYLIT_PREVIEW||'http://127.0.0.1:8767';
   const before=await page.locator('main').boundingBox();await page.getByRole('button',{name:'Collapse navigation',exact:true}).click();await page.waitForTimeout(150);
   assert.equal(await page.locator('#nav-toggle').getAttribute('aria-expanded'),'false');assert.equal(await page.locator('.momo-home').isVisible(),false);assert.equal(await page.evaluate(()=>Momo.status().paused),true);
   for(const label of ['Overview','Weather','Photos','Calendar','Settings'])assert.equal(await page.locator('#main-nav').getByRole('button',{name:label,exact:true}).isVisible(),true);
+  if(width<=600)assert.ok((await page.locator('.rail').boundingBox()).height<=120);
   if(width>600){const rail=await page.locator('.rail').boundingBox();assert.equal(rail.width,72);assert.ok((await page.locator('main').boundingBox()).width>before.width);}
   for(const b of await page.locator('#main-nav button:visible').all()){const r=await b.boundingBox();assert.ok(r.width>=48&&r.height>=48);}
   if(process.env.SKYLIT_NAV_SCREENSHOTS)await page.screenshot({path:process.env.SKYLIT_NAV_SCREENSHOTS+'/navigation-'+width+'.png'});
