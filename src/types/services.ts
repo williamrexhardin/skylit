@@ -1,5 +1,7 @@
 /** The native methods used by React. JavaScript-only adapters keep their own APIs. */
 export interface NativeBridge {
+  navigationStatus(): string;
+  navigationConfigure(enabled: boolean): void;
   spotifyStatus(): string;
   spotifyCommand(action: string): boolean;
   spotifyOpen(): void;
