@@ -18,7 +18,7 @@
       wrapper.classList.add('card','dashboard-utility');const heading=node('div','section-title'),title=node('h2',null,definition.name),action=node('button','quiet');
       window.SkylitUI.renderNode(action,window.SkylitUI.template("ModuleActionIcon"));
       action.setAttribute('aria-label',definition.type==='forecast'?'Open full weather forecast':'Manage '+definition.name.toLowerCase());
-      action.onclick=()=>definition.type==='forecast'?app.go('weather'):definition.type==='note'||definition.type==='countdowns'?app.openSettings('household','overview'):app.go('household');
+      action.onclick=()=>definition.type==='spotify'?app.openSettings('services','overview'):definition.type==='forecast'?app.go('weather'):definition.type==='note'||definition.type==='countdowns'?app.openSettings('household','overview'):app.go('household');
       heading.append(title,action);wrapper.append(heading,node('div','dashboard-module-content'));
     }
     wrapper.hidden=true;wrappers.set(definition.type,wrapper);grid.append(wrapper);

@@ -1,5 +1,9 @@
 /** The native methods used by React. JavaScript-only adapters keep their own APIs. */
 export interface NativeBridge {
+  spotifyStatus(): string;
+  spotifyCommand(action: string): boolean;
+  spotifyOpen(): void;
+  spotifyPermission(): void;
   photoStatus(): string;
   calendarList(): string;
   updateStatus(): string;

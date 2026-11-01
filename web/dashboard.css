@@ -314,3 +314,16 @@
 
 /* Gesture handles must override the shared button manipulation policy. */
 .dashboard-workbench .dashboard-move,.dashboard-workbench .dashboard-resize{touch-action:none}
+
+/* Native Spotify session controls; track metadata stays on the frame. */
+.spotify-player{display:flex;flex-direction:column;gap:10px;min-width:0}
+.spotify-player p{margin:0}
+.spotify-track{display:flex;align-items:center;gap:12px;min-width:0}
+.spotify-track>div{min-width:0;display:flex;flex-direction:column;gap:5px}
+.spotify-track strong,.spotify-track span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:100%}
+.spotify-art{width:64px;height:64px;object-fit:cover;border-radius:8px;flex:none}
+.spotify-controls{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.spotify-controls button{min-width:48px;min-height:48px}
+[data-module=spotify] .dashboard-module-content{overflow:auto;min-height:0}
+[data-module=spotify] .spotify-player{padding-bottom:4px}
+.dashboard-palette-preview[data-preview-type=spotify]{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px}

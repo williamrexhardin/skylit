@@ -7,7 +7,7 @@
   <uses-permission android:name="android.permission.UPDATE_PACKAGES_WITHOUT_USER_ACTION" />
   <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
 
-  <queries><intent><action android:name="android.intent.action.MAIN"/><category android:name="android.intent.category.LAUNCHER"/></intent></queries>
+  <queries><package android:name="com.spotify.music"/><intent><action android:name="android.intent.action.MAIN"/><category android:name="android.intent.category.LAUNCHER"/></intent></queries>
   <application
       android:label="Hardin Skylit"
       android:allowBackup="false"
@@ -15,6 +15,9 @@
       android:hardwareAccelerated="true"
       android:usesCleartextTraffic="false"
       android:theme="@android:style/Theme.NoTitleBar.Fullscreen">
+    <service android:name="com.wesbos.homehq.SpotifyListener" android:label="Skylit Spotify controls" android:permission="android.permission.BIND_NOTIFICATION_LISTENER_SERVICE" android:exported="true">
+      <intent-filter><action android:name="android.service.notification.NotificationListenerService" /></intent-filter>
+    </service>
     <receiver android:name="com.wesbos.homehq.UpdateReceiver" android:exported="false" />
     <service android:name="com.wesbos.homehq.UpdateJob" android:permission="android.permission.BIND_JOB_SERVICE" android:exported="true" />
     <activity

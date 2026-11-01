@@ -12,6 +12,7 @@
     {type:'note',name:'Note',description:'The pinned note from Household settings.',minW:3,minH:3},
     {type:'shopping',name:'Shopping list',description:'Check off items on your shared on-frame list.',minW:3,minH:4},
     {type:'countdowns',name:'Countdowns',description:'Days until your saved occasions.',minW:3,minH:3},
+    {type:'spotify',name:'Spotify',description:'Control the Spotify Android app playing on this frame.',minW:3,minH:3},
     {type:'timers',name:'Timers',description:'Your running on-frame timers; no background alarm.',minW:3,minH:3}
   ];
   const definition=type=>catalog.find(item=>item.type===type);
@@ -55,7 +56,7 @@
       if(distance<score){best=item;score=distance;}
     }return best;
   }
-  function arrange(layout){return {version:1,modules:layout.modules.map((item,i)=>{const next={type:item.type,x:(i%3)*4,y:Math.floor(i/3)*4,w:4,h:4};setStyle(next,item.style);return next;})};}
+  function arrange(layout){const cols=layout.modules.length>9?4:3,w=12/cols;return {version:1,modules:layout.modules.map((item,i)=>{const next={type:item.type,x:(i%cols)*w,y:Math.floor(i/cols)*4,w,h:4};setStyle(next,item.style);return next;})};}
   function add(layout,type,position=null){
     if(!definition(type)||layout.modules.some(item=>item.type===type))return {layout:copy(layout),added:false,rearranged:false};
     const next=copy(layout),item={type,x:0,y:0,w:4,h:4};
