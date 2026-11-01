@@ -232,4 +232,4 @@ main{margin:0 auto}
 :root[data-nav-collapsed=true] .rail{width:72px;min-width:72px;padding:12px 8px}
 :root[data-nav-collapsed=true] .rail .momo-home,:root[data-nav-collapsed=true] .rail .rail-bottom,:root[data-nav-collapsed=true] .rail .nav-label{display:none}
 :root[data-nav-collapsed=true] .rail .nav{width:56px;min-width:48px;min-height:48px;padding:12px;justify-content:center;gap:0;font-size:0}
-@media(max-width:799px){:root[data-nav-collapsed=true] .rail{width:100%;min-width:0;padding:8px;display:flex;align-items:flex-start;gap:4px}:root[data-nav-collapsed=true] .rail-toggle{width:48px;flex:0 0 48px;margin:0}:root[data-nav-collapsed=true] .rail nav{display:flex;flex:1;flex-wrap:wrap;gap:2px}:root[data-nav-collapsed=true] .rail .nav{width:48px;flex:0 0 48px}}
+@media(max-width:799px){:root[data-nav-collapsed=true] .rail{width:100%;min-width:0;padding:8px;display:flex;flex-direction:row;align-items:flex-start;gap:4px}:root[data-nav-collapsed=true] .rail-toggle{width:48px;flex:0 0 48px;margin:0}:root[data-nav-collapsed=true] .rail nav{display:flex;flex:1;flex-wrap:wrap;gap:2px}:root[data-nav-collapsed=true] .rail .nav{width:48px;flex:0 0 48px}}
