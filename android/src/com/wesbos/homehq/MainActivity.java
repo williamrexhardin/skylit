@@ -48,7 +48,7 @@ public class MainActivity extends Activity {
   private boolean swallowIdleTouch,quietOpen;
   private int idleGeneration,localPhotoGeneration;
   private int remoteGeneration=0, dashboardCrashes=0;
-  private String photoVideoScript;
+  private String photoVideoScript,photoSlideshowScript;
   private final Runnable photoVideoTask=()->watchPhotoVideo(remoteGeneration);
   private boolean exitArmed;
   private float exitX,exitY;
@@ -245,35 +245,36 @@ public class MainActivity extends Activity {
     if(idlePhotos){photoHint=new TextView(this);photoHint.setText("Touch to return to Skylit");photoHint.setTextColor(Color.WHITE);photoHint.setTextSize(12);photoHint.setPadding(18,10,18,10);photoHint.setBackgroundColor(0x55000000);FrameLayout.LayoutParams lp=new FrameLayout.LayoutParams(-2,-2,Gravity.BOTTOM|Gravity.END);lp.setMargins(0,0,15,15);root.addView(photoHint,lp);}
     else {returnButton=new Button(this);returnButton.setText("‹  Skylit");returnButton.setTextColor(Color.rgb(53,46,40));returnButton.setBackgroundTintList(android.content.res.ColorStateList.valueOf(Color.rgb(246,239,225)));returnButton.setOnClickListener(v->closeRemote());FrameLayout.LayoutParams lp=new FrameLayout.LayoutParams(dp(110),dp(52),Gravity.BOTTOM|Gravity.START);lp.setMargins(12,0,0,12);root.addView(returnButton,lp);}
   }
+  private String photoScript(String name) throws IOException {
+    try(java.io.InputStream in=getAssets().open(name)){java.io.ByteArrayOutputStream bytes=new java.io.ByteArrayOutputStream();byte[] buffer=new byte[4096];int n;while((n=in.read(buffer))!=-1)bytes.write(buffer,0,n);return new String(bytes.toByteArray(),java.nio.charset.StandardCharsets.UTF_8);}
+  }
   private void startSlideshow(int generation,int attempt){
-    if(remote==null||generation!=remoteGeneration||!remotePhotos)return;
-    // Google Photos is a third-party UI. Exact visible labels are deliberately used;
-    // if they change, the album remains usable manually instead of clicking guesses.
-    if(slideshowStarted)return;
-    String js="(function(){var visible=function(e){var r=e.getBoundingClientRect();return r.width>0&&r.height>0&&getComputedStyle(e).visibility!=='hidden'};var els=Array.from(document.querySelectorAll('[role=menuitem],button,[role=button]'));var slide=els.find(function(e){return visible(e)&&((e.innerText||'').trim()==='Slideshow'||e.getAttribute('aria-label')==='Slideshow')});var menu=els.find(function(e){return visible(e)&&/^(More options|More Options|More)$/.test(e.getAttribute('aria-label')||'')});var el=slide||menu;if(!el)return JSON.stringify({action:'waiting'});var r=el.getBoundingClientRect();return JSON.stringify({action:slide?'slideshow':'menu',x:(r.left+r.width/2)/innerWidth,y:(r.top+r.height/2)/innerHeight})})()";
-    remote.evaluateJavascript(js,result->{
-      if(remote==null||generation!=remoteGeneration)return;
-      try{
-        String decoded=(String)new org.json.JSONTokener(result).nextValue();JSONObject action=new JSONObject(decoded);
-        String name=action.optString("action");Log.i(TAG,"Slideshow control: "+action.toString());
-        if(name.equals("slideshow")||name.equals("menu")){
-          float x=(float)action.getDouble("x")*remote.getWidth(),y=(float)action.getDouble("y")*remote.getHeight();
-          long now=android.os.SystemClock.uptimeMillis();
-          MotionEvent down=MotionEvent.obtain(now,now,MotionEvent.ACTION_DOWN,x,y,0),up=MotionEvent.obtain(now,now+80,MotionEvent.ACTION_UP,x,y,0);
-          remote.dispatchTouchEvent(down);down.recycle();handler.postDelayed(()->{if(remote!=null&&generation==remoteGeneration)remote.dispatchTouchEvent(up);up.recycle();},80);
-          if(name.equals("slideshow")){slideshowStarted=true;Log.i(TAG,"Google Photos slideshow touched");handler.postDelayed(photoVideoTask,1500);return;}
-        }
-      }catch(Exception e){Log.w(TAG,"Could not locate slideshow control");}
-      if(attempt<12)handler.postDelayed(()->startSlideshow(generation,attempt+1),900);
-      else{Log.w(TAG,"Slideshow auto-start unavailable; album kept open");if(!idlePhotos)Toast.makeText(this,"Use the album menu and choose Slideshow if needed.",Toast.LENGTH_LONG).show();}
-    });
+    if(remote==null||generation!=remoteGeneration||!remotePhotos||!foreground||slideshowStarted)return;
+    Uri page=Uri.parse(remote.getUrl()==null?"":remote.getUrl());
+    if(!"https".equals(page.getScheme())||!"photos.google.com".equals(page.getHost()))return;
+    final WebView view=remote;
+    try{
+      if(photoVideoScript==null)photoVideoScript=photoScript("google-photos-video.js");
+      if(photoSlideshowScript==null)photoSlideshowScript=photoScript("google-photos-slideshow.js");
+      // Observe player messages BEFORE the slideshow creates its cross-origin player.
+      String js=photoVideoScript+";if(!window.__skylitVideoWatch)window.__skylitVideoWatch=SkylitPhotoVideo.create(document);"+photoSlideshowScript+";JSON.stringify(SkylitPhotoSlideshow.step(document))";
+      view.evaluateJavascript(js,result->{
+        if(view!=remote||generation!=remoteGeneration||!foreground)return;
+        try{
+          JSONObject action=new JSONObject((String)new org.json.JSONTokener(result).nextValue());
+          if("active".equals(action.optString("action"))){slideshowStarted=true;Log.i(TAG,"Google Photos slideshow confirmed");handler.postDelayed(photoVideoTask,800);return;}
+        }catch(Exception ignored){}
+        if(attempt<20)handler.postDelayed(()->startSlideshow(generation,attempt+1),900);
+        else{Log.w(TAG,"Slideshow auto-start unavailable; album kept open");if(!idlePhotos)Toast.makeText(this,"Use the album menu and choose Slideshow if needed.",Toast.LENGTH_LONG).show();}
+      });
+    }catch(IOException ignored){Log.w(TAG,"Photo automation asset unavailable");}
   }
 
   private void watchPhotoVideo(int generation){
     if(remote==null||generation!=remoteGeneration||!remotePhotos||!slideshowStarted||!foreground)return;
     if(!"photos.google.com".equals(Uri.parse(remote.getUrl()==null?"":remote.getUrl()).getHost())){handler.postDelayed(photoVideoTask,1500);return;}
     try{
-      if(photoVideoScript==null){try(java.io.InputStream in=getAssets().open("google-photos-video.js")){java.io.ByteArrayOutputStream bytes=new java.io.ByteArrayOutputStream();byte[] buffer=new byte[4096];int n;while((n=in.read(buffer))!=-1)bytes.write(buffer,0,n);photoVideoScript=new String(bytes.toByteArray(),java.nio.charset.StandardCharsets.UTF_8);}}
+      if(photoVideoScript==null)photoVideoScript=photoScript("google-photos-video.js");
       final WebView view=remote;
       view.evaluateJavascript(photoVideoScript+";JSON.stringify((window.__skylitVideoWatch||(window.__skylitVideoWatch=SkylitPhotoVideo.create(document))).check(Date.now()))",result->{
         if(view!=remote||generation!=remoteGeneration||!foreground)return;
@@ -310,7 +311,7 @@ public class MainActivity extends Activity {
     return super.dispatchTouchEvent(e);
   }
   private void pauseMomo(boolean paused){if(dashboard!=null)dashboard.evaluateJavascript("window.Momo&&window.Momo.setPaused("+paused+")",null);}
-  @Override protected void onResume(){super.onResume();foreground=true;handler.removeCallbacks(photoVideoTask);if(remotePhotos&&slideshowStarted)handler.postDelayed(photoVideoTask,1500);if(updates!=null)updates.touched();pauseMomo(remote!=null||localPhotosOpen||quietOpen);if(photoMail!=null)photoMail.maybeSync();resetIdle();hideBars();}
+  @Override protected void onResume(){super.onResume();foreground=true;if(remotePhotos&&!slideshowStarted&&remote!=null)handler.postDelayed(()->startSlideshow(remoteGeneration,0),500);handler.removeCallbacks(photoVideoTask);if(remotePhotos&&slideshowStarted)handler.postDelayed(photoVideoTask,1500);if(updates!=null)updates.touched();pauseMomo(remote!=null||localPhotosOpen||quietOpen);if(photoMail!=null)photoMail.maybeSync();resetIdle();hideBars();}
   @Override protected void onPause(){foreground=false;handler.removeCallbacks(photoVideoTask);pauseMomo(true);handler.removeCallbacks(idleTask);handler.removeCallbacks(exitTask);if(updates!=null)updates.activity(false);super.onPause();}
   @Override protected void onNewIntent(Intent intent){super.onNewIntent(intent);WebView.setWebContentsDebuggingEnabled(intent.getBooleanExtra("debug",false));if(remote!=null)closeRemote();if(localPhotosOpen&&dashboard!=null)dashboard.evaluateJavascript("window.SkylitPhotos&&window.SkylitPhotos.close()",null);}
   @Override public void onBackPressed(){if(quietOpen&&dashboard!=null){dashboard.evaluateJavascript("window.SkylitWorkspace&&window.SkylitWorkspace.restore()",null);return;}if(remote!=null){if(fullScreen!=null){hideCustomView();if(remoteDocked&&returnButton!=null){root.removeView(returnButton);returnButton=null;}}else if(remote.canGoBack())remote.goBack();else{closeRemote();dashboard.evaluateJavascript("window.SkylitApp&&SkylitApp.go(\"overview\")",null);}}else if(localPhotosOpen&&dashboard!=null)dashboard.evaluateJavascript("window.SkylitPhotos&&window.SkylitPhotos.close()",null);else if(dashboard!=null)dashboard.evaluateJavascript("window.SkylitApp&&window.SkylitApp.back()",null);}
